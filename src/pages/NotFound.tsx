@@ -18,13 +18,13 @@ const NotFound = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
       <h1 className="text-6xl font-bold text-sooq-green mb-4">404</h1>
-      <p className="text-xl text-gray-600 mb-6">Oops! Page not found</p>
+      <p className="text-xl text-gray-600 mb-6">عذراً! الصفحة غير موجودة</p>
       <p className="text-gray-500 mb-8 text-center max-w-md">
-        The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+        الصفحة التي تبحث عنها قد تكون تمت إزالتها، أو تم تغيير اسمها، أو أنها غير متوفرة مؤقتاً.
       </p>
       <Link to="/">
         <Button className="bg-sooq-green hover:bg-sooq-green-light">
-          Return to Home
+          العودة إلى الرئيسية
         </Button>
       </Link>
     </div>

@@ -28,17 +28,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
           alt={name} 
           className="w-full h-48 object-cover"
         />
-        <div className="absolute top-2 right-2">
+        <div className="absolute top-2 left-2">
           <span className={condition === 'new' ? 'badge-new' : 'badge-used'}>
-            {condition === 'new' ? 'New' : 'Used'}
+            {condition === 'new' ? 'جديد' : 'مستعمل'}
           </span>
         </div>
       </div>
       <div className="p-3">
         <h3 className="font-medium text-lg leading-tight truncate">{name}</h3>
-        <p className="text-sooq-green font-bold text-xl mt-1">${price.toFixed(2)}</p>
+        <p className="text-sooq-green font-bold text-xl mt-1">{price.toFixed(2)} $</p>
         <div className="flex items-center text-gray-500 text-sm mt-2">
-          <MapPin size={14} className="mr-1" />
+          <MapPin size={14} className="ml-1" />
           <span className="truncate">{location}</span>
         </div>
       </div>

@@ -26,10 +26,10 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
           <Button
             variant={selectedCategory === null ? "default" : "outline"}
             size="sm"
-            className={selectedCategory === null ? "bg-sooq-green hover:bg-sooq-green-light" : ""}
+            className={selectedCategory === null ? "bg-sooq-green hover:bg-sooq-green-light mr-2" : "mr-2"}
             onClick={() => onSelectCategory(null)}
           >
-            All
+            الكل
           </Button>
           
           {categories.map((category) => (
@@ -37,7 +37,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
               key={category.id}
               variant={selectedCategory === category.id ? "default" : "outline"}
               size="sm"
-              className={selectedCategory === category.id ? "bg-sooq-green hover:bg-sooq-green-light" : ""}
+              className={selectedCategory === category.id ? "bg-sooq-green hover:bg-sooq-green-light mr-2" : "mr-2"}
               onClick={() => onSelectCategory(category.id)}
             >
               {category.name}

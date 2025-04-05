@@ -19,29 +19,29 @@ const Layout: React.FC<LayoutProps> = ({ children, hideSearch = false }) => {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <Link to="/" className="flex items-center">
-            <h1 className="text-2xl font-bold text-sooq-green">Syria Sooq</h1>
+            <h1 className="text-2xl font-bold text-sooq-green">سوق سوريا</h1>
           </Link>
           
           {!hideSearch && (
             <div className="hidden md:flex relative flex-1 max-w-md mx-4">
               <Input 
                 type="text" 
-                placeholder="Search products..." 
-                className="w-full pl-10"
+                placeholder="ابحث عن المنتجات..." 
+                className="w-full pr-10"
               />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
             </div>
           )}
           
           <div className="flex items-center space-x-2">
             <Link to="/login">
               <Button variant="outline" size="sm" className="hidden md:flex">
-                Sign In
+                تسجيل الدخول
               </Button>
             </Link>
             <Link to="/register">
-              <Button size="sm" className="hidden md:flex bg-sooq-green hover:bg-sooq-green-light">
-                Sign Up
+              <Button size="sm" className="hidden md:flex bg-sooq-green hover:bg-sooq-green-light mr-2">
+                إنشاء حساب
               </Button>
             </Link>
           </div>
@@ -53,10 +53,10 @@ const Layout: React.FC<LayoutProps> = ({ children, hideSearch = false }) => {
             <div className="relative">
               <Input 
                 type="text" 
-                placeholder="Search products..." 
-                className="w-full pl-10"
+                placeholder="ابحث عن المنتجات..." 
+                className="w-full pr-10"
               />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
             </div>
           </div>
         )}
@@ -72,23 +72,23 @@ const Layout: React.FC<LayoutProps> = ({ children, hideSearch = false }) => {
         <div className="flex justify-around">
           <Link to="/" className={`flex flex-col items-center py-2 flex-1 ${location.pathname === '/' ? 'text-sooq-green' : 'text-gray-500'}`}>
             <Home size={24} />
-            <span className="text-xs">Home</span>
+            <span className="text-xs">الرئيسية</span>
           </Link>
           <Link to="/search" className={`flex flex-col items-center py-2 flex-1 ${location.pathname === '/search' ? 'text-sooq-green' : 'text-gray-500'}`}>
             <Search size={24} />
-            <span className="text-xs">Search</span>
+            <span className="text-xs">البحث</span>
           </Link>
           <Link to="/add-product" className={`flex flex-col items-center py-2 flex-1 ${location.pathname === '/add-product' ? 'text-sooq-green' : 'text-gray-500'}`}>
             <PlusCircle size={24} />
-            <span className="text-xs">Sell</span>
+            <span className="text-xs">بيع</span>
           </Link>
           <Link to="/my-products" className={`flex flex-col items-center py-2 flex-1 ${location.pathname === '/my-products' ? 'text-sooq-green' : 'text-gray-500'}`}>
             <ShoppingBag size={24} />
-            <span className="text-xs">My Items</span>
+            <span className="text-xs">منتجاتي</span>
           </Link>
           <Link to="/profile" className={`flex flex-col items-center py-2 flex-1 ${location.pathname === '/profile' ? 'text-sooq-green' : 'text-gray-500'}`}>
             <User size={24} />
-            <span className="text-xs">Profile</span>
+            <span className="text-xs">الملف</span>
           </Link>
         </div>
       </nav>

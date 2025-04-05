@@ -86,7 +86,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border font-cairo;
   }
 
   body {
