@@ -1,0 +1,99 @@
+
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Search, Home, PlusCircle, User, ShoppingBag } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+
+interface LayoutProps {
+  children: React.ReactNode;
+  hideSearch?: boolean;
+}
+
+const Layout: React.FC<LayoutProps> = ({ children, hideSearch = false }) => {
+  const location = useLocation();
+  
+  return (
+    <div className="flex flex-col min-h-screen">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <Link to="/" className="flex items-center">
+            <h1 className="text-2xl font-bold text-sooq-green">Syria Sooq</h1>
+          </Link>
+          
+          {!hideSearch && (
+            <div className="hidden md:flex relative flex-1 max-w-md mx-4">
+              <Input 
+                type="text" 
+                placeholder="Search products..." 
+                className="w-full pl-10"
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            </div>
+          )}
+          
+          <div className="flex items-center space-x-2">
+            <Link to="/login">
+              <Button variant="outline" size="sm" className="hidden md:flex">
+                Sign In
+              </Button>
+            </Link>
+            <Link to="/register">
+              <Button size="sm" className="hidden md:flex bg-sooq-green hover:bg-sooq-green-light">
+                Sign Up
+              </Button>
+            </Link>
+          </div>
+        </div>
+        
+        {/* Mobile Search */}
+        {!hideSearch && (
+          <div className="md:hidden px-4 pb-3">
+            <div className="relative">
+              <Input 
+                type="text" 
+                placeholder="Search products..." 
+                className="w-full pl-10"
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            </div>
+          </div>
+        )}
+      </header>
+      
+      {/* Main Content */}
+      <main className="flex-1 container mx-auto px-4 py-6">
+        {children}
+      </main>
+      
+      {/* Footer Navigation (Mobile) */}
+      <nav className="md:hidden bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 z-10">
+        <div className="flex justify-around">
+          <Link to="/" className={`flex flex-col items-center py-2 flex-1 ${location.pathname === '/' ? 'text-sooq-green' : 'text-gray-500'}`}>
+            <Home size={24} />
+            <span className="text-xs">Home</span>
+          </Link>
+          <Link to="/search" className={`flex flex-col items-center py-2 flex-1 ${location.pathname === '/search' ? 'text-sooq-green' : 'text-gray-500'}`}>
+            <Search size={24} />
+            <span className="text-xs">Search</span>
+          </Link>
+          <Link to="/add-product" className={`flex flex-col items-center py-2 flex-1 ${location.pathname === '/add-product' ? 'text-sooq-green' : 'text-gray-500'}`}>
+            <PlusCircle size={24} />
+            <span className="text-xs">Sell</span>
+          </Link>
+          <Link to="/my-products" className={`flex flex-col items-center py-2 flex-1 ${location.pathname === '/my-products' ? 'text-sooq-green' : 'text-gray-500'}`}>
+            <ShoppingBag size={24} />
+            <span className="text-xs">My Items</span>
+          </Link>
+          <Link to="/profile" className={`flex flex-col items-center py-2 flex-1 ${location.pathname === '/profile' ? 'text-sooq-green' : 'text-gray-500'}`}>
+            <User size={24} />
+            <span className="text-xs">Profile</span>
+          </Link>
+        </div>
+      </nav>
+    </div>
+  );
+};
+
+export default Layout;
