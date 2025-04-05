@@ -13,8 +13,8 @@ const Register = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
-      title: "Registration successful",
-      description: "Please check your email to verify your account.",
+      title: "تم إنشاء الحساب بنجاح",
+      description: "يرجى التحقق من بريدك الإلكتروني لتأكيد حسابك.",
     });
     // In a real app, this would handle the registration logic
     // For now we just show a toast notification
@@ -25,48 +25,48 @@ const Register = () => {
       <div className="w-full max-w-md">
         <div className="text-center mb-6">
           <Link to="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-sooq-green">Syria Sooq</h1>
+            <h1 className="text-3xl font-bold text-sooq-green">سوق سوريا</h1>
           </Link>
         </div>
         
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">Create an Account</CardTitle>
+            <CardTitle className="text-xl">إنشاء حساب</CardTitle>
             <CardDescription>
-              Join Syria Sooq to buy and sell products
+              انضم إلى سوق سوريا لبيع وشراء المنتجات
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
-                <Input id="fullName" placeholder="John Doe" required />
+                <Label htmlFor="fullName">الاسم الكامل</Label>
+                <Input id="fullName" placeholder="محمد أحمد" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">البريد الإلكتروني</Label>
                 <Input id="email" type="email" placeholder="your@email.com" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input id="username" placeholder="johndoe" required />
+                <Label htmlFor="username">اسم المستخدم</Label>
+                <Input id="username" placeholder="mohamad_ahmed" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">كلمة المرور</Label>
                 <Input id="password" type="password" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword">تأكيد كلمة المرور</Label>
                 <Input id="confirmPassword" type="password" required />
               </div>
             </CardContent>
             <CardFooter className="flex flex-col">
               <Button type="submit" className="w-full bg-sooq-green hover:bg-sooq-green-light">
-                Create Account
+                إنشاء حساب
               </Button>
               <p className="mt-4 text-center text-sm text-gray-600">
-                Already have an account?{' '}
+                لديك حساب بالفعل؟{' '}
                 <Link to="/login" className="text-sooq-green hover:underline">
-                  Sign in
+                  تسجيل الدخول
                 </Link>
               </p>
             </CardFooter>

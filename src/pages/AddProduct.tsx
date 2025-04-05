@@ -36,45 +36,45 @@ const AddProduct = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
-      title: "Product added successfully",
-      description: "Your product has been listed on Syria Sooq!",
+      title: "تمت إضافة المنتج بنجاح",
+      description: "تم إدراج منتجك في سوق سوريا!",
     });
     // In a real app, this would handle the product submission logic
   };
   
   const categories = [
-    { id: 'electronics', name: 'Electronics' },
-    { id: 'furniture', name: 'Furniture' },
-    { id: 'clothing', name: 'Clothing' },
-    { id: 'vehicles', name: 'Vehicles' },
-    { id: 'toys', name: 'Toys' },
-    { id: 'books', name: 'Books' },
+    { id: 'electronics', name: 'إلكترونيات' },
+    { id: 'furniture', name: 'أثاث' },
+    { id: 'clothing', name: 'ملابس' },
+    { id: 'vehicles', name: 'مركبات' },
+    { id: 'toys', name: 'ألعاب' },
+    { id: 'books', name: 'كتب' },
   ];
   
   return (
     <Layout hideSearch>
       <div className="max-w-2xl mx-auto pb-16">
-        <h1 className="text-2xl font-bold mb-6">Add New Product</h1>
+        <h1 className="text-2xl font-bold mb-6">إضافة منتج جديد</h1>
         
         <Card>
           <form onSubmit={handleSubmit}>
             <CardHeader>
-              <CardTitle>Product Details</CardTitle>
+              <CardTitle>تفاصيل المنتج</CardTitle>
               <CardDescription>
-                Fill in the details about the item you want to sell.
+                املأ تفاصيل العنصر الذي ترغب في بيعه.
               </CardDescription>
             </CardHeader>
             
             <CardContent className="space-y-6">
               {/* Image Upload */}
               <div className="space-y-2">
-                <Label htmlFor="image">Product Images</Label>
+                <Label htmlFor="image">صور المنتج</Label>
                 <div className="border-2 border-dashed rounded-lg p-6 text-center">
                   {imagePreview ? (
                     <div className="relative inline-block">
                       <img 
                         src={imagePreview} 
-                        alt="Product preview" 
+                        alt="معاينة المنتج" 
                         className="max-h-48 rounded-lg mx-auto"
                       />
                       <button 
@@ -89,7 +89,7 @@ const AddProduct = () => {
                     <div className="py-8">
                       <Upload className="mx-auto h-12 w-12 text-gray-300" />
                       <p className="mt-2 text-sm text-gray-500">
-                        Click to upload or drag and drop
+                        انقر للتحميل أو اسحب وأفلت
                       </p>
                       <input
                         id="image"
@@ -105,16 +105,16 @@ const AddProduct = () => {
               
               {/* Product Name */}
               <div className="space-y-2">
-                <Label htmlFor="name">Product Name</Label>
-                <Input id="name" placeholder="e.g. Apple iPhone 12 Pro" required />
+                <Label htmlFor="name">اسم المنتج</Label>
+                <Input id="name" placeholder="مثال: آيفون 12 برو" required />
               </div>
               
               {/* Description */}
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">الوصف</Label>
                 <Textarea 
                   id="description" 
-                  placeholder="Describe your product in detail..." 
+                  placeholder="صف منتجك بالتفصيل..." 
                   rows={5}
                   required
                 />
@@ -122,7 +122,7 @@ const AddProduct = () => {
               
               {/* Price */}
               <div className="space-y-2">
-                <Label htmlFor="price">Price (USD)</Label>
+                <Label htmlFor="price">السعر (دولار أمريكي)</Label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
                   <Input 
@@ -139,25 +139,25 @@ const AddProduct = () => {
               
               {/* Condition */}
               <div className="space-y-2">
-                <Label>Condition</Label>
+                <Label>الحالة</Label>
                 <RadioGroup defaultValue="new">
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="new" id="condition-new" />
-                    <Label htmlFor="condition-new" className="cursor-pointer">New</Label>
+                    <Label htmlFor="condition-new" className="cursor-pointer">جديد</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="used" id="condition-used" />
-                    <Label htmlFor="condition-used" className="cursor-pointer">Used</Label>
+                    <Label htmlFor="condition-used" className="cursor-pointer">مستعمل</Label>
                   </div>
                 </RadioGroup>
               </div>
               
               {/* Category */}
               <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="category">الفئة</Label>
                 <Select>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
+                    <SelectValue placeholder="اختر فئة" />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((category) => (
@@ -171,14 +171,14 @@ const AddProduct = () => {
               
               {/* Location */}
               <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <Input id="location" placeholder="e.g. Damascus, Syria" required />
+                <Label htmlFor="location">الموقع</Label>
+                <Input id="location" placeholder="مثال: دمشق، سوريا" required />
               </div>
             </CardContent>
             
             <CardFooter>
               <Button type="submit" className="w-full bg-sooq-green hover:bg-sooq-green-light">
-                List Product
+                نشر المنتج
               </Button>
             </CardFooter>
           </form>
