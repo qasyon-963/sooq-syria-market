@@ -84,7 +84,7 @@ const Search = () => {
       </form>
       
       {searchResults.length > 0 ? (
-        <div className="product-grid">
+        <div className="product-grid w-full">
           {searchResults.map(product => (
             <ProductCard
               key={product.id}

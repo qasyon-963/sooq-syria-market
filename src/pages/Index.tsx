@@ -118,7 +118,7 @@ const Index = () => {
         </Button>
       </div>
       
-      <div className="product-grid">
+      <div className="product-grid w-full">
         {filteredProducts.map((product) => (
           <ProductCard
             key={product.id}
