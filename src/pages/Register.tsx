@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,15 +9,17 @@ import { useToast } from '@/hooks/use-toast';
 
 const Register = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
       title: "تم إنشاء الحساب بنجاح",
-      description: "يرجى التحقق من بريدك الإلكتروني لتأكيد حسابك.",
+      description: "يرجى التحقق من بريدك الإلكتروني لتأكيد حسابك في سوق سوريا.",
     });
-    // In a real app, this would handle the registration logic
-    // For now we just show a toast notification
+    // In a real app, this would handle the registration logic and send confirmation email
+    // For now we just show a toast notification and redirect
+    navigate('/');
   };
   
   return (

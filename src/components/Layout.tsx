@@ -1,9 +1,10 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Home, PlusCircle, User, ShoppingBag } from 'lucide-react';
+import { Search, Home, PlusCircle, User, ShoppingBag, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,6 +13,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, hideSearch = false }) => {
   const location = useLocation();
+  const isMobile = useIsMobile();
   
   return (
     <div className="flex flex-col min-h-screen">
@@ -34,6 +36,11 @@ const Layout: React.FC<LayoutProps> = ({ children, hideSearch = false }) => {
           )}
           
           <div className="flex items-center space-x-2">
+            <Link to="/login" className="md:hidden">
+              <Button size="sm" variant="ghost">
+                <LogIn className="h-5 w-5 text-sooq-green" />
+              </Button>
+            </Link>
             <Link to="/login">
               <Button variant="outline" size="sm" className="hidden md:flex">
                 تسجيل الدخول
@@ -63,7 +70,7 @@ const Layout: React.FC<LayoutProps> = ({ children, hideSearch = false }) => {
       </header>
       
       {/* Main Content */}
-      <main className="flex-1 container mx-auto px-4 py-6">
+      <main className="flex-1 container mx-auto px-4 py-6 pb-20 md:pb-6">
         {children}
       </main>
       
