@@ -1,13 +1,25 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { PlusCircle, Pencil, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
 
-// Mock user products data
-const userProducts = [
+// Mock user products data - will be replaced with actual database data
+const initialUserProducts = [
   {
     id: '1',
     name: 'ماك بوك برو',
@@ -29,6 +41,19 @@ const userProducts = [
 ];
 
 const MyProducts = () => {
+  const [userProducts, setUserProducts] = useState(initialUserProducts);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
+  const { toast } = useToast();
+  
+  const handleDeleteProduct = (id: string) => {
+    setUserProducts(prev => prev.filter(product => product.id !== id));
+    toast({
+      title: "تم حذف المنتج",
+      description: "تم حذف المنتج بنجاح من قائمة منتجاتك",
+    });
+    setProductToDelete(null);
+  };
+
   return (
     <Layout>
       <div className="flex justify-between items-center mb-6">
@@ -71,10 +96,36 @@ const MyProducts = () => {
                     <Pencil size={16} className="ml-1" />
                     تعديل
                   </Button>
-                  <Button variant="outline" size="sm" className="text-red-500 border-red-500 hover:bg-red-50">
-                    <Trash size={16} className="ml-1" />
-                    حذف
-                  </Button>
+                  <AlertDialog open={productToDelete === product.id} onOpenChange={(open) => !open && setProductToDelete(null)}>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-red-500 border-red-500 hover:bg-red-50"
+                        onClick={() => setProductToDelete(product.id)}
+                      >
+                        <Trash size={16} className="ml-1" />
+                        حذف
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>هل أنت متأكد من حذف هذا المنتج؟</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          لا يمكن التراجع عن هذا الإجراء بعد تنفيذه.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => handleDeleteProduct(product.id)}
+                          className="bg-red-500 hover:bg-red-600 text-white"
+                        >
+                          حذف
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             </div>

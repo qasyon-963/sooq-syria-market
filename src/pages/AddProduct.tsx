@@ -12,11 +12,33 @@ import { Upload, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
-// This would typically come from a context or global state in a real app
+// In a real app, this would be a context or global state management
+let userProductsGlobal = [
+  {
+    id: '1',
+    name: 'ماك بوك برو',
+    price: 1299,
+    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
+    status: 'available' as const,
+    views: 24,
+    createdAt: '2023-05-15',
+  },
+  {
+    id: '3',
+    name: 'سماعات آبل إيربودز برو',
+    price: 249,
+    image: 'https://images.unsplash.com/photo-1606741965509-ca2bf4b1d430?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
+    status: 'sold' as const,
+    views: 56,
+    createdAt: '2023-04-20',
+  },
+];
+
+// This would be in a proper state management system in a real app
 const addProductToUserProducts = (product) => {
-  // In a real app, this would add the product to a database
-  console.log("Adding product:", product);
-  // For demonstration, we're not actually storing it persistently
+  userProductsGlobal = [product, ...userProductsGlobal];
+  console.log("Product added:", product);
+  console.log("Updated products list:", userProductsGlobal);
 };
 
 const AddProduct = () => {
@@ -29,6 +51,7 @@ const AddProduct = () => {
     category: '',
     location: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -73,6 +96,7 @@ const AddProduct = () => {
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
     if (!formData.name || !formData.price || !formData.location) {
       toast({
@@ -80,6 +104,7 @@ const AddProduct = () => {
         description: "يرجى ملء جميع الحقول المطلوبة",
         variant: "destructive"
       });
+      setIsSubmitting(false);
       return;
     }
     
@@ -105,8 +130,10 @@ const AddProduct = () => {
       description: "تم إدراج منتجك في سوق سوريا!",
     });
     
-    // Redirect to My Products page
-    navigate('/my-products');
+    setTimeout(() => {
+      // Redirect to My Products page after a short delay to allow toast to be seen
+      navigate('/my-products');
+    }, 1000);
   };
   
   const categories = [
@@ -153,7 +180,7 @@ const AddProduct = () => {
                       </button>
                     </div>
                   ) : (
-                    <div className="py-8">
+                    <div className="py-8 relative">
                       <Upload className="mx-auto h-12 w-12 text-gray-300" />
                       <p className="mt-2 text-sm text-gray-500">
                         انقر للتحميل أو اسحب وأفلت
@@ -260,8 +287,12 @@ const AddProduct = () => {
             </CardContent>
             
             <CardFooter>
-              <Button type="submit" className="w-full bg-sooq-green hover:bg-sooq-green-light">
-                نشر المنتج
+              <Button 
+                type="submit" 
+                className="w-full bg-sooq-green hover:bg-sooq-green-light"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'جاري النشر...' : 'نشر المنتج'}
               </Button>
             </CardFooter>
           </form>

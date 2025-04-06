@@ -16,11 +16,11 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle
+  AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 
-// Mock user data
+// Mock user data - will be replaced with actual database data
 const userInitialData = {
   name: 'محمد أحمد',
   email: 'mohamed@example.com',
@@ -43,17 +43,18 @@ const Profile = () => {
     if (isEditing) {
       // Cancel editing - reset data
       setEditedUser(user);
+      setAvatarPreview(user.avatar);
     }
     setIsEditing(!isEditing);
   };
 
   const handleSaveChanges = () => {
     // In a real app, this would make an API call
-    setUser(editedUser);
+    const updatedUser = {...editedUser};
     if (avatarPreview) {
-      // Update avatar
-      // In a real app, you would upload the image to a server
+      updatedUser.avatar = avatarPreview;
     }
+    setUser(updatedUser);
     setIsEditing(false);
     toast({
       title: "تم تحديث الملف الشخصي",
@@ -113,6 +114,8 @@ const Profile = () => {
                 <Button 
                   size="icon"
                   className="absolute bottom-0 left-0 rounded-full bg-sooq-green hover:bg-sooq-green-light h-8 w-8 cursor-pointer"
+                  type="button"
+                  aria-label="Change profile picture"
                 >
                   <Camera size={16} />
                 </Button>

@@ -24,6 +24,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -34,21 +35,27 @@ const Login = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
     
     if (!email || !password) {
       setError('يرجى ملء جميع الحقول المطلوبة');
+      setIsLoading(false);
       return;
     }
     
-    if (validateLogin(email, password)) {
-      toast({
-        title: "تم تسجيل الدخول بنجاح",
-        description: "مرحباً بك مجدداً في سوق سوريا!",
-      });
-      navigate('/');
-    } else {
-      setError('البريد الإلكتروني أو كلمة المرور غير صحيحة');
-    }
+    // Simulate API call
+    setTimeout(() => {
+      if (validateLogin(email, password)) {
+        toast({
+          title: "تم تسجيل الدخول بنجاح",
+          description: "مرحباً بك مجدداً في سوق سوريا!",
+        });
+        navigate('/');
+      } else {
+        setError('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+      }
+      setIsLoading(false);
+    }, 1000);
   };
   
   return (
@@ -84,6 +91,7 @@ const Login = () => {
                     required 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={isLoading}
                   />
                 </div>
                 <div className="space-y-2">
@@ -99,6 +107,7 @@ const Login = () => {
                     required 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
                   />
                 </div>
                 <div className="text-sm text-gray-600">
@@ -106,8 +115,12 @@ const Login = () => {
                 </div>
               </CardContent>
               <CardFooter className="flex flex-col">
-                <Button type="submit" className="w-full bg-sooq-green hover:bg-sooq-green-light">
-                  تسجيل الدخول
+                <Button 
+                  type="submit" 
+                  className="w-full bg-sooq-green hover:bg-sooq-green-light"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
                 </Button>
                 <p className="mt-4 text-center text-sm text-gray-600">
                   ليس لديك حساب؟{' '}
