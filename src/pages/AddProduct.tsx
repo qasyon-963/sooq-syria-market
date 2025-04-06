@@ -10,11 +10,49 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
+
+// This would typically come from a context or global state in a real app
+const addProductToUserProducts = (product) => {
+  // In a real app, this would add the product to a database
+  console.log("Adding product:", product);
+  // For demonstration, we're not actually storing it persistently
+};
 
 const AddProduct = () => {
-  const [images, setImages] = useState<string[]>([]);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    price: '',
+    condition: 'new',
+    category: '',
+    location: '',
+  });
   const { toast } = useToast();
+  const navigate = useNavigate();
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+  
+  const handleSelectChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+  
+  const handleRadioChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      condition: value
+    }));
+  };
   
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -35,11 +73,40 @@ const AddProduct = () => {
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.name || !formData.price || !formData.location) {
+      toast({
+        title: "خطأ في النموذج",
+        description: "يرجى ملء جميع الحقول المطلوبة",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const newProduct = {
+      id: Date.now().toString(), // Generate a unique ID
+      name: formData.name,
+      description: formData.description,
+      price: parseFloat(formData.price),
+      condition: formData.condition as 'new' | 'used',
+      category: formData.category,
+      location: formData.location,
+      image: imagePreview || 'https://via.placeholder.com/300',
+      status: 'available',
+      views: 0,
+      createdAt: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
+    };
+    
+    // Add the product to the user's products
+    addProductToUserProducts(newProduct);
+    
     toast({
       title: "تمت إضافة المنتج بنجاح",
       description: "تم إدراج منتجك في سوق سوريا!",
     });
-    // In a real app, this would handle the product submission logic
+    
+    // Redirect to My Products page
+    navigate('/my-products');
   };
   
   const categories = [
@@ -106,7 +173,13 @@ const AddProduct = () => {
               {/* Product Name */}
               <div className="space-y-2">
                 <Label htmlFor="name">اسم المنتج</Label>
-                <Input id="name" placeholder="مثال: آيفون 12 برو" required />
+                <Input 
+                  id="name" 
+                  placeholder="مثال: آيفون 12 برو" 
+                  required
+                  value={formData.name}
+                  onChange={handleInputChange}
+                />
               </div>
               
               {/* Description */}
@@ -117,6 +190,8 @@ const AddProduct = () => {
                   placeholder="صف منتجك بالتفصيل..." 
                   rows={5}
                   required
+                  value={formData.description}
+                  onChange={handleInputChange}
                 />
               </div>
               
@@ -133,6 +208,8 @@ const AddProduct = () => {
                     placeholder="0.00" 
                     className="pl-7"
                     required
+                    value={formData.price}
+                    onChange={handleInputChange}
                   />
                 </div>
               </div>
@@ -140,7 +217,7 @@ const AddProduct = () => {
               {/* Condition */}
               <div className="space-y-2">
                 <Label>الحالة</Label>
-                <RadioGroup defaultValue="new">
+                <RadioGroup defaultValue="new" value={formData.condition} onValueChange={handleRadioChange}>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="new" id="condition-new" />
                     <Label htmlFor="condition-new" className="cursor-pointer">جديد</Label>
@@ -155,7 +232,7 @@ const AddProduct = () => {
               {/* Category */}
               <div className="space-y-2">
                 <Label htmlFor="category">الفئة</Label>
-                <Select>
+                <Select value={formData.category} onValueChange={(value) => handleSelectChange('category', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="اختر فئة" />
                   </SelectTrigger>
@@ -172,7 +249,13 @@ const AddProduct = () => {
               {/* Location */}
               <div className="space-y-2">
                 <Label htmlFor="location">الموقع</Label>
-                <Input id="location" placeholder="مثال: دمشق، سوريا" required />
+                <Input 
+                  id="location" 
+                  placeholder="مثال: دمشق، سوريا" 
+                  required
+                  value={formData.location}
+                  onChange={handleInputChange}
+                />
               </div>
             </CardContent>
             

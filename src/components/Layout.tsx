@@ -76,25 +76,25 @@ const Layout: React.FC<LayoutProps> = ({ children, hideSearch = false }) => {
       
       {/* Footer Navigation (Mobile) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-10 bg-white border-t border-gray-200 shadow-md">
-        <div className="flex items-center justify-around w-full px-1 py-2">
-          <Link to="/" className={`flex flex-col items-center py-2 flex-1 ${location.pathname === '/' ? 'text-sooq-green' : 'text-gray-500'}`}>
-            <Home size={22} />
+        <div className="flex items-center justify-center w-full">
+          <Link to="/" className={`flex flex-col items-center justify-center py-3 flex-1 ${location.pathname === '/' ? 'text-sooq-green' : 'text-gray-500'}`}>
+            <Home size={20} />
             <span className="text-xs mt-1">الرئيسية</span>
           </Link>
-          <Link to="/search" className={`flex flex-col items-center py-2 flex-1 ${location.pathname === '/search' ? 'text-sooq-green' : 'text-gray-500'}`}>
-            <Search size={22} />
+          <Link to="/search" className={`flex flex-col items-center justify-center py-3 flex-1 ${location.pathname === '/search' ? 'text-sooq-green' : 'text-gray-500'}`}>
+            <Search size={20} />
             <span className="text-xs mt-1">البحث</span>
           </Link>
-          <Link to="/add-product" className={`flex flex-col items-center py-2 flex-1 ${location.pathname === '/add-product' ? 'text-sooq-green' : 'text-gray-500'}`}>
-            <PlusCircle size={22} />
+          <Link to="/add-product" className={`flex flex-col items-center justify-center py-3 flex-1 ${location.pathname === '/add-product' ? 'text-sooq-green' : 'text-gray-500'}`}>
+            <PlusCircle size={20} />
             <span className="text-xs mt-1">بيع</span>
           </Link>
-          <Link to="/my-products" className={`flex flex-col items-center py-2 flex-1 ${location.pathname === '/my-products' ? 'text-sooq-green' : 'text-gray-500'}`}>
-            <ShoppingBag size={22} />
+          <Link to="/my-products" className={`flex flex-col items-center justify-center py-3 flex-1 ${location.pathname === '/my-products' ? 'text-sooq-green' : 'text-gray-500'}`}>
+            <ShoppingBag size={20} />
             <span className="text-xs mt-1">منتجاتي</span>
           </Link>
-          <Link to="/profile" className={`flex flex-col items-center py-2 flex-1 ${location.pathname === '/profile' ? 'text-sooq-green' : 'text-gray-500'}`}>
-            <User size={22} />
+          <Link to="/profile" className={`flex flex-col items-center justify-center py-3 flex-1 ${location.pathname === '/profile' ? 'text-sooq-green' : 'text-gray-500'}`}>
+            <User size={20} />
             <span className="text-xs mt-1">الملف</span>
           </Link>
         </div>

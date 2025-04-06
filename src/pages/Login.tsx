@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,19 +7,47 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 
+// Mock user database - in a real app, this would be on a server
+const mockUsers = [
+  {
+    email: 'user@example.com',
+    password: 'password123'
+  },
+  {
+    email: 'demo@sooq.com',
+    password: 'demo1234'
+  }
+];
+
 const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const { toast } = useToast();
   const navigate = useNavigate();
   
+  const validateLogin = (email: string, password: string) => {
+    return mockUsers.some(user => user.email === email && user.password === password);
+  };
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "تم تسجيل الدخول بنجاح",
-      description: "مرحباً بك مجدداً في سوق سوريا!",
-    });
-    // In a real app, this would handle the login logic
-    // For now we just show a toast notification and redirect
-    navigate('/');
+    setError('');
+    
+    if (!email || !password) {
+      setError('يرجى ملء جميع الحقول المطلوبة');
+      return;
+    }
+    
+    if (validateLogin(email, password)) {
+      toast({
+        title: "تم تسجيل الدخول بنجاح",
+        description: "مرحباً بك مجدداً في سوق سوريا!",
+      });
+      navigate('/');
+    } else {
+      setError('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+    }
   };
   
   return (
@@ -40,9 +68,21 @@ const Login = () => {
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
+              {error && (
+                <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm">
+                  {error}
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="email">البريد الإلكتروني</Label>
-                <Input id="email" type="email" placeholder="your@email.com" required />
+                <Input 
+                  id="email" 
+                  type="email" 
+                  placeholder="your@email.com" 
+                  required 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -51,7 +91,16 @@ const Login = () => {
                     نسيت كلمة المرور؟
                   </Link>
                 </div>
-                <Input id="password" type="password" required />
+                <Input 
+                  id="password" 
+                  type="password" 
+                  required 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <div className="text-sm text-gray-600">
+                للتجربة، استخدم: demo@sooq.com / demo1234
               </div>
             </CardContent>
             <CardFooter className="flex flex-col">
