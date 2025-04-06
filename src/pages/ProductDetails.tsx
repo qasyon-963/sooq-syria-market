@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Layout from '@/components/Layout';
@@ -16,6 +17,7 @@ const products = [
     location: 'دمشق، سوريا',
     category: 'electronics',
     description: 'ماك بوك برو 13 بوصة مع شريحة M1. ذاكرة وصول عشوائي 8 جيجابايت، تخزين SSD 256 جيجابايت. في حالة ممتازة، بالكاد تم استخدامه. يتضمن العلبة الأصلية.',
+    sellerId: 'seller1',
     sellerName: 'أحمد خالد',
     sellerPhone: '+963 934 567 890',
     postedDate: 'منذ يومين',
@@ -29,6 +31,7 @@ const products = [
     location: 'حلب، سوريا',
     category: 'electronics',
     description: 'هاتف سامسونج جالاكسي S21 جديد، لا يزال مختوماً في العلبة. سعة تخزين 128 جيجابايت، لون رمادي فانتوم. كفالة كاملة.',
+    sellerId: 'seller2',
     sellerName: 'ليلى إبراهيم',
     sellerPhone: '+963 955 123 456',
     postedDate: 'منذ أسبوع',
@@ -111,10 +114,12 @@ const ProductDetails = () => {
                 <span>{product.sellerPhone}</span>
               </Button>
               
-              <Button variant="outline" className="w-full sm:w-auto flex items-center justify-center gap-2">
-                <MessageSquare size={18} />
-                <span>مراسلة</span>
-              </Button>
+              <Link to={`/chat/${product.sellerId}/${product.id}`}>
+                <Button variant="outline" className="w-full sm:w-auto flex items-center justify-center gap-2">
+                  <MessageSquare size={18} />
+                  <span>مراسلة</span>
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
