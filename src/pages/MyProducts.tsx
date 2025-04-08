@@ -61,7 +61,7 @@ const MyProducts = () => {
         if (error) throw error;
         
         setUserProducts(data || []);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching products:', error);
         toast({
           title: "خطأ في تحميل المنتجات",
@@ -93,7 +93,7 @@ const MyProducts = () => {
         title: "تم حذف المنتج",
         description: "تم حذف المنتج بنجاح من قائمة منتجاتك",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting product:', error);
       toast({
         title: "خطأ في حذف المنتج",
