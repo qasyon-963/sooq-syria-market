@@ -24,9 +24,9 @@ interface Product {
   id: string;
   name: string;
   price: number;
-  image_url: string;
+  image_url: string | null;
   status: 'available' | 'sold' | 'deleted';
-  views: number;
+  views: number | null;
   created_at: string;
 }
 
@@ -60,7 +60,18 @@ const MyProducts = () => {
           
         if (error) throw error;
         
-        setUserProducts(data || []);
+        // Convert the response data to match our Product interface
+        const typedProducts: Product[] = data?.map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          image_url: item.image_url,
+          status: (item.status as 'available' | 'sold' | 'deleted') || 'available',
+          views: item.views,
+          created_at: item.created_at
+        })) || [];
+        
+        setUserProducts(typedProducts);
       } catch (error: any) {
         console.error('Error fetching products:', error);
         toast({
@@ -130,7 +141,7 @@ const MyProducts = () => {
           {userProducts.map(product => (
             <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden flex">
               <img 
-                src={product.image_url} 
+                src={product.image_url || '/placeholder.svg'} 
                 alt={product.name} 
                 className="w-24 h-24 sm:w-32 sm:h-32 object-cover"
               />
@@ -147,7 +158,7 @@ const MyProducts = () => {
                   </div>
                   <p className="text-sooq-green font-bold mt-1">{product.price.toFixed(2)} $</p>
                   <p className="text-sm text-gray-500 mt-1">
-                    {product.views} مشاهدة • نُشر {new Date(product.created_at).toLocaleDateString('ar-SA')}
+                    {product.views || 0} مشاهدة • نُشر {new Date(product.created_at).toLocaleDateString('ar-SA')}
                   </p>
                 </div>
                 <div className="flex space-x-2 mt-2">
