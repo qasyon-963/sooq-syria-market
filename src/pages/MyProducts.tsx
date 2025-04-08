@@ -85,6 +85,34 @@ const MyProducts = () => {
     };
     
     fetchUserProducts();
+    
+    // Set up real-time subscription for the user's products
+    const channel = supabase
+      .channel('public:products:user')
+      .on('postgres_changes', { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'products',
+        filter: `seller_id=eq.${user.id}`
+      }, (payload) => {
+        const newProduct = payload.new as any;
+        // Add the new product to the list
+        setUserProducts(prev => [{
+          id: newProduct.id,
+          name: newProduct.name,
+          price: newProduct.price,
+          image_url: newProduct.image_url,
+          status: (newProduct.status as 'available' | 'sold' | 'deleted') || 'available',
+          views: newProduct.views,
+          created_at: newProduct.created_at
+        }, ...prev]);
+      })
+      .subscribe();
+    
+    // Cleanup subscription on unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user, navigate, toast]);
   
   const handleDeleteProduct = async (id: string) => {

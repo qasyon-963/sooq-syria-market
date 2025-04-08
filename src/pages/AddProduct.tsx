@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -27,6 +26,7 @@ const AddProduct = () => {
     sellerPhone: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newProductId, setNewProductId] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -42,6 +42,13 @@ const AddProduct = () => {
       navigate('/login');
     }
   }, [user, navigate, toast]);
+
+  // Effect to navigate to the newly created product
+  useEffect(() => {
+    if (newProductId) {
+      navigate(`/product/${newProductId}`);
+    }
+  }, [newProductId, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -135,7 +142,7 @@ const AddProduct = () => {
       }
       
       // Insert the product data into the database
-      const { error } = await supabase.from('products').insert({
+      const { error, data } = await supabase.from('products').insert({
         name: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
@@ -145,18 +152,20 @@ const AddProduct = () => {
         seller_id: user.id,
         seller_phone: formData.sellerPhone,
         image_url: imageUrl || 'https://via.placeholder.com/300',
-      });
+      }).select();
       
       if (error) throw error;
+      
+      // Set the new product ID to trigger navigation
+      if (data && data.length > 0) {
+        setNewProductId(data[0].id);
+      }
       
       toast({
         title: "تمت إضافة المنتج بنجاح",
         description: "تم إدراج منتجك في سوق سوريا!",
       });
       
-      setTimeout(() => {
-        navigate('/my-products');
-      }, 1000);
     } catch (error: any) {
       console.error('Error adding product:', error);
       toast({
@@ -197,7 +206,6 @@ const AddProduct = () => {
             </CardHeader>
             
             <CardContent className="space-y-6">
-              {/* Image Upload */}
               <div className="space-y-2">
                 <Label htmlFor="image">صور المنتج</Label>
                 <div className="border-2 border-dashed rounded-lg p-6 text-center">
@@ -234,7 +242,6 @@ const AddProduct = () => {
                 </div>
               </div>
               
-              {/* Product Name */}
               <div className="space-y-2">
                 <Label htmlFor="name">اسم المنتج</Label>
                 <Input 
@@ -246,7 +253,6 @@ const AddProduct = () => {
                 />
               </div>
               
-              {/* Description */}
               <div className="space-y-2">
                 <Label htmlFor="description">الوصف</Label>
                 <Textarea 
@@ -259,7 +265,6 @@ const AddProduct = () => {
                 />
               </div>
               
-              {/* Price */}
               <div className="space-y-2">
                 <Label htmlFor="price">السعر (دولار أمريكي)</Label>
                 <div className="relative">
@@ -278,7 +283,6 @@ const AddProduct = () => {
                 </div>
               </div>
               
-              {/* Seller Phone Number - New Field */}
               <div className="space-y-2">
                 <Label htmlFor="sellerPhone">رقم هاتف البائع</Label>
                 <Input 
@@ -292,7 +296,6 @@ const AddProduct = () => {
                 <p className="text-xs text-gray-500">سيتم عرض رقم هاتفك للمشترين المحتملين</p>
               </div>
               
-              {/* Condition */}
               <div className="space-y-2">
                 <Label>الحالة</Label>
                 <RadioGroup defaultValue="new" value={formData.condition} onValueChange={handleRadioChange}>
@@ -307,7 +310,6 @@ const AddProduct = () => {
                 </RadioGroup>
               </div>
               
-              {/* Category */}
               <div className="space-y-2">
                 <Label htmlFor="category">الفئة</Label>
                 <Select value={formData.category} onValueChange={(value) => handleSelectChange('category', value)}>
@@ -324,7 +326,6 @@ const AddProduct = () => {
                 </Select>
               </div>
               
-              {/* Location */}
               <div className="space-y-2">
                 <Label htmlFor="location">الموقع</Label>
                 <Input 

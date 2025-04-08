@@ -1,12 +1,26 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import ProductCard from '@/components/ProductCard';
 import CategoryFilter from '@/components/CategoryFilter';
 import { Button } from '@/components/ui/button';
 import { Filter } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
-// Mock data
+// Define types for our data
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  image_url: string | null;
+  condition: 'new' | 'used';
+  location: string;
+  category: string | null;
+  created_at: string;
+}
+
+// Local category definitions
 const categories = [
   { id: 'electronics', name: 'إلكترونيات' },
   { id: 'furniture', name: 'أثاث' },
@@ -16,87 +30,95 @@ const categories = [
   { id: 'books', name: 'كتب' },
 ];
 
-const products = [
-  {
-    id: '1',
-    name: 'ماك بوك برو',
-    price: 1299,
-    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-    condition: 'used' as const,
-    location: 'دمشق، سوريا',
-    category: 'electronics',
-  },
-  {
-    id: '2',
-    name: 'سامسونج جالاكسي S21',
-    price: 799,
-    image: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-    condition: 'new' as const,
-    location: 'حلب، سوريا',
-    category: 'electronics',
-  },
-  {
-    id: '3',
-    name: 'طاولة طعام خشبية',
-    price: 350,
-    image: 'https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-    condition: 'used' as const,
-    location: 'حمص، سوريا',
-    category: 'furniture',
-  },
-  {
-    id: '4',
-    name: 'سترة جلدية',
-    price: 120,
-    image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-    condition: 'new' as const,
-    location: 'اللاذقية، سوريا',
-    category: 'clothing',
-  },
-  {
-    id: '5',
-    name: 'هوندا سيفيك 2018',
-    price: 15000,
-    image: 'https://images.unsplash.com/photo-1533106418989-88406c7cc8ca?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-    condition: 'used' as const,
-    location: 'دمشق، سوريا',
-    category: 'vehicles',
-  },
-  {
-    id: '6',
-    name: 'مجموعة ليغو حرب النجوم',
-    price: 79.99,
-    image: 'https://images.unsplash.com/photo-1563901935883-cb9fb1be74b4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-    condition: 'new' as const,
-    location: 'حلب، سوريا',
-    category: 'toys',
-  },
-  {
-    id: '7',
-    name: 'مجموعة كتب هاري بوتر',
-    price: 89.99,
-    image: 'https://images.unsplash.com/photo-1551269901-5c5e14c25df7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-    condition: 'used' as const,
-    location: 'حمص، سوريا',
-    category: 'books',
-  },
-  {
-    id: '8',
-    name: 'سماعات لاسلكية',
-    price: 129.99,
-    image: 'https://images.unsplash.com/photo-1578319439584-104c94d37305?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-    condition: 'new' as const,
-    location: 'اللاذقية، سوريا',
-    category: 'electronics',
-  },
-];
-
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
   
-  const filteredProducts = selectedCategory 
-    ? products.filter(product => product.category === selectedCategory)
-    : products;
+  // Fetch products from Supabase
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        let query = supabase
+          .from('products')
+          .select('*')
+          .eq('status', 'available')
+          .order('created_at', { ascending: false });
+        
+        if (selectedCategory) {
+          query = query.eq('category', selectedCategory);
+        }
+        
+        const { data, error } = await query;
+        
+        if (error) throw error;
+        
+        // Convert data to our Product interface
+        const typedProducts: Product[] = data?.map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          image_url: item.image_url,
+          condition: item.condition as 'new' | 'used',
+          location: item.location,
+          category: item.category,
+          created_at: item.created_at
+        })) || [];
+        
+        setProducts(typedProducts);
+      } catch (error: any) {
+        console.error('Error fetching products:', error);
+        toast({
+          title: "خطأ في تحميل المنتجات",
+          description: "لم نتمكن من تحميل المنتجات. يرجى المحاولة مرة أخرى.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchProducts();
+    
+    // Set up real-time subscription for new products
+    const channel = supabase
+      .channel('public:products')
+      .on('postgres_changes', { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'products',
+        filter: selectedCategory ? `category=eq.${selectedCategory}` : undefined
+      }, (payload) => {
+        const newProduct = payload.new as any;
+        // Only add the product if it matches our filter criteria
+        if (newProduct.status === 'available' && (!selectedCategory || newProduct.category === selectedCategory)) {
+          // Add the new product to the list
+          setProducts(prev => [{
+            id: newProduct.id,
+            name: newProduct.name,
+            price: newProduct.price,
+            image_url: newProduct.image_url,
+            condition: newProduct.condition as 'new' | 'used',
+            location: newProduct.location,
+            category: newProduct.category,
+            created_at: newProduct.created_at
+          }, ...prev]);
+          
+          // Show a toast notification
+          toast({
+            title: "منتج جديد",
+            description: `تم إضافة منتج جديد: ${newProduct.name}`,
+          });
+        }
+      })
+      .subscribe();
+    
+    // Cleanup subscription on unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [selectedCategory, toast]);
   
   return (
     <Layout>
@@ -118,20 +140,30 @@ const Index = () => {
         </Button>
       </div>
       
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {filteredProducts.map((product) => (
-          <div key={product.id} className="w-full">
-            <ProductCard
-              id={product.id}
-              name={product.name}
-              price={product.price}
-              image={product.image}
-              condition={product.condition}
-              location={product.location}
-            />
-          </div>
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500">جاري تحميل المنتجات...</p>
+        </div>
+      ) : products.length > 0 ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {products.map((product) => (
+            <div key={product.id} className="w-full">
+              <ProductCard
+                id={product.id}
+                name={product.name}
+                price={product.price}
+                image={product.image_url || '/placeholder.svg'}
+                condition={product.condition}
+                location={product.location}
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-gray-500">لا توجد منتجات متاحة في هذه الفئة</p>
+        </div>
+      )}
     </Layout>
   );
 };
