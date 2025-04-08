@@ -122,7 +122,7 @@ const Index = () => {
   
   return (
     <Layout>
-      <div className="mb-6">
+      <div className="mb-6 text-right">
         <h1 className="text-2xl font-bold mb-2">تصفح المنتجات</h1>
         <p className="text-gray-600">ابحث عن أفضل العروض على المنتجات في سوريا</p>
       </div>
@@ -145,9 +145,9 @@ const Index = () => {
           <p className="text-gray-500">جاري تحميل المنتجات...</p>
         </div>
       ) : products.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="product-grid">
           {products.map((product) => (
-            <div key={product.id} className="w-full">
+            <div key={product.id} className="w-full product-item">
               <ProductCard
                 id={product.id}
                 name={product.name}
