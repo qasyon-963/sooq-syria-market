@@ -122,26 +122,28 @@ const Index = () => {
   
   return (
     <Layout>
-      <div className="mb-6 text-right">
-        <h1 className="text-2xl font-bold mb-2">تصفح المنتجات</h1>
-        <p className="text-gray-600">ابحث عن أفضل العروض على المنتجات في سوريا</p>
+      <div className="mb-4 text-right">
+        <h1 className="text-xl font-bold mb-1">تصفح المنتجات</h1>
+        <p className="text-gray-600 text-sm">ابحث عن أفضل العروض على المنتجات في سوريا</p>
       </div>
       
-      <div className="flex justify-between items-center mb-4">
+      <div className="mb-3">
         <CategoryFilter 
           categories={categories}
           selectedCategory={selectedCategory}
           onSelectCategory={setSelectedCategory}
         />
-        
+      </div>
+      
+      <div className="flex justify-end items-center mb-2">
         <Button variant="outline" size="sm" className="flex items-center gap-1">
           <Filter size={16} />
-          <span className="hidden sm:inline">تصفية</span>
+          <span className="text-xs">تصفية</span>
         </Button>
       </div>
       
       {isLoading ? (
-        <div className="text-center py-12">
+        <div className="text-center py-8">
           <p className="text-gray-500">جاري تحميل المنتجات...</p>
         </div>
       ) : products.length > 0 ? (
@@ -160,7 +162,7 @@ const Index = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
+        <div className="text-center py-8">
           <p className="text-gray-500">لا توجد منتجات متاحة في هذه الفئة</p>
         </div>
       )}
