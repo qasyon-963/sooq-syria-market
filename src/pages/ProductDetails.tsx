@@ -1,47 +1,79 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { MapPin, Phone, MessageSquare, ArrowLeft } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
-// Mock product data - in a real app, this would come from an API
-const products = [
-  {
-    id: '1',
-    name: 'ماك بوك برو',
-    price: 1299,
-    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-    condition: 'used' as const,
-    location: 'دمشق، سوريا',
-    category: 'electronics',
-    description: 'ماك بوك برو 13 بوصة مع شريحة M1. ذاكرة وصول عشوائي 8 جيجابايت، تخزين SSD 256 جيجابايت. في حالة ممتازة، بالكاد تم استخدامه. يتضمن العلبة الأصلية.',
-    sellerId: 'seller1',
-    sellerName: 'أحمد خالد',
-    sellerPhone: '+963 934 567 890',
-    postedDate: 'منذ يومين',
-  },
-  {
-    id: '2',
-    name: 'سامسونج جالاكسي S21',
-    price: 799,
-    image: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-    condition: 'new' as const,
-    location: 'حلب، سوريا',
-    category: 'electronics',
-    description: 'هاتف سامسونج جالاكسي S21 جديد، لا يزال مختوماً في العلبة. سعة تخزين 128 جيجابايت، لون رمادي فانتوم. كفالة كاملة.',
-    sellerId: 'seller2',
-    sellerName: 'ليلى إبراهيم',
-    sellerPhone: '+963 955 123 456',
-    postedDate: 'منذ أسبوع',
-  },
-  // ... other products would be here
-];
+// Define product interface
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  image_url: string | null;
+  condition: 'new' | 'used';
+  location: string;
+  category: string | null;
+  description: string | null;
+  seller_id: string;
+  seller_phone: string | null;
+  created_at: string;
+}
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const product = products.find(p => p.id === id);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    const fetchProductDetails = async () => {
+      if (!id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('id', id)
+          .single();
+          
+        if (error) throw error;
+        
+        setProduct(data as Product);
+        
+        // Update view count
+        await supabase
+          .from('products')
+          .update({ views: (data.views || 0) + 1 })
+          .eq('id', id);
+          
+      } catch (error: any) {
+        console.error('Error fetching product details:', error);
+        toast({
+          title: "خطأ في تحميل تفاصيل المنتج",
+          description: "لم نتمكن من تحميل تفاصيل المنتج. يرجى المحاولة مرة أخرى.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchProductDetails();
+  }, [id, toast]);
+  
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="text-center py-12">
+          <p className="text-gray-500">جاري تحميل تفاصيل المنتج...</p>
+        </div>
+      </Layout>
+    );
+  }
   
   if (!product) {
     return (
@@ -55,6 +87,10 @@ const ProductDetails = () => {
       </Layout>
     );
   }
+  
+  // Format the date
+  const postedDate = new Date(product.created_at);
+  const timeAgo = getTimeAgo(postedDate);
   
   return (
     <Layout hideSearch>
@@ -70,7 +106,7 @@ const ProductDetails = () => {
           {/* Product Image */}
           <div className="md:w-1/2">
             <img 
-              src={product.image} 
+              src={product.image_url || '/placeholder.svg'} 
               alt={product.name} 
               className="w-full h-64 md:h-full object-cover"
             />
@@ -93,28 +129,30 @@ const ProductDetails = () => {
             </div>
             
             <div className="text-gray-500 text-sm mt-1">
-              نُشر {product.postedDate}
+              نُشر {timeAgo}
             </div>
             
             <Separator className="my-4" />
             
             <h2 className="font-medium text-lg mb-2">الوصف</h2>
-            <p className="text-gray-700 mb-6">{product.description}</p>
+            <p className="text-gray-700 mb-6">{product.description || 'لا يوجد وصف للمنتج'}</p>
             
             <Separator className="my-4" />
             
             <h2 className="font-medium text-lg mb-3">معلومات البائع</h2>
             <div className="mb-6">
-              <p className="font-medium">{product.sellerName}</p>
+              <p className="font-medium">البائع</p>
             </div>
             
             <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
-              <Button className="bg-sooq-green hover:bg-sooq-green-light w-full sm:w-auto flex items-center justify-center gap-2">
-                <Phone size={18} />
-                <span>{product.sellerPhone}</span>
-              </Button>
+              {product.seller_phone && (
+                <Button className="bg-sooq-green hover:bg-sooq-green-light w-full sm:w-auto flex items-center justify-center gap-2">
+                  <Phone size={18} />
+                  <span>{product.seller_phone}</span>
+                </Button>
+              )}
               
-              <Link to={`/chat/${product.sellerId}/${product.id}`}>
+              <Link to={`/chat/${product.seller_id}/${product.id}`}>
                 <Button variant="outline" className="w-full sm:w-auto flex items-center justify-center gap-2">
                   <MessageSquare size={18} />
                   <span>مراسلة</span>
@@ -126,6 +164,39 @@ const ProductDetails = () => {
       </div>
     </Layout>
   );
+};
+
+// Helper function to format time ago
+const getTimeAgo = (date: Date) => {
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  
+  if (diffInSeconds < 60) {
+    return 'منذ لحظات';
+  }
+  
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) {
+    return `منذ ${diffInMinutes} دقيقة`;
+  }
+  
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) {
+    return `منذ ${diffInHours} ساعة`;
+  }
+  
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 30) {
+    return `منذ ${diffInDays} يوم`;
+  }
+  
+  const diffInMonths = Math.floor(diffInDays / 30);
+  if (diffInMonths < 12) {
+    return `منذ ${diffInMonths} شهر`;
+  }
+  
+  const diffInYears = Math.floor(diffInMonths / 12);
+  return `منذ ${diffInYears} سنة`;
 };
 
 export default ProductDetails;

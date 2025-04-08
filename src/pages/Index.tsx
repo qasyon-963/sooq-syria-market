@@ -83,7 +83,7 @@ const Index = () => {
     
     // Set up real-time subscription for new products
     const channel = supabase
-      .channel('public:products')
+      .channel('products-channel')
       .on('postgres_changes', { 
         event: 'INSERT', 
         schema: 'public', 
