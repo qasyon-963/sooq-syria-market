@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,38 +11,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Upload, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-
-// In a real app, this would be a context or global state management
-let userProductsGlobal = [
-  {
-    id: '1',
-    name: 'ماك بوك برو',
-    price: 1299,
-    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-    status: 'available' as const,
-    views: 24,
-    createdAt: '2023-05-15',
-  },
-  {
-    id: '3',
-    name: 'سماعات آبل إيربودز برو',
-    price: 249,
-    image: 'https://images.unsplash.com/photo-1606741965509-ca2bf4b1d430?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-    status: 'sold' as const,
-    views: 56,
-    createdAt: '2023-04-20',
-  },
-];
-
-// This would be in a proper state management system in a real app
-const addProductToUserProducts = (product) => {
-  userProductsGlobal = [product, ...userProductsGlobal];
-  console.log("Product added:", product);
-  console.log("Updated products list:", userProductsGlobal);
-};
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const AddProduct = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -50,11 +24,25 @@ const AddProduct = () => {
     condition: 'new',
     category: '',
     location: '',
+    sellerPhone: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
   
+  useEffect(() => {
+    // Redirect to login if not authenticated
+    if (!user) {
+      toast({
+        title: "يجب تسجيل الدخول",
+        description: "يرجى تسجيل الدخول لإضافة منتج جديد",
+        variant: "destructive"
+      });
+      navigate('/login');
+    }
+  }, [user, navigate, toast]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({
@@ -79,23 +67,37 @@ const AddProduct = () => {
   
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const reader = new FileReader();
+      const file = e.target.files[0];
+      setImageFile(file);
       
+      const reader = new FileReader();
       reader.onload = function(e) {
         const result = e.target?.result as string;
         setImagePreview(result);
       };
       
-      reader.readAsDataURL(e.target.files[0]);
+      reader.readAsDataURL(file);
     }
   };
   
   const handleRemoveImage = () => {
     setImagePreview(null);
+    setImageFile(null);
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user) {
+      toast({
+        title: "يجب تسجيل الدخول",
+        description: "يرجى تسجيل الدخول لإضافة منتج جديد",
+        variant: "destructive"
+      });
+      navigate('/login');
+      return;
+    }
+    
     setIsSubmitting(true);
     
     if (!formData.name || !formData.price || !formData.location) {
@@ -108,32 +110,63 @@ const AddProduct = () => {
       return;
     }
     
-    const newProduct = {
-      id: Date.now().toString(), // Generate a unique ID
-      name: formData.name,
-      description: formData.description,
-      price: parseFloat(formData.price),
-      condition: formData.condition as 'new' | 'used',
-      category: formData.category,
-      location: formData.location,
-      image: imagePreview || 'https://via.placeholder.com/300',
-      status: 'available',
-      views: 0,
-      createdAt: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
-    };
-    
-    // Add the product to the user's products
-    addProductToUserProducts(newProduct);
-    
-    toast({
-      title: "تمت إضافة المنتج بنجاح",
-      description: "تم إدراج منتجك في سوق سوريا!",
-    });
-    
-    setTimeout(() => {
-      // Redirect to My Products page after a short delay to allow toast to be seen
-      navigate('/my-products');
-    }, 1000);
+    try {
+      let imageUrl = null;
+      
+      // Upload image if exists
+      if (imageFile) {
+        const fileExt = imageFile.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const filePath = `${user.id}/${fileName}`;
+        
+        // Upload the image
+        const { error: uploadError, data } = await supabase.storage
+          .from('products')
+          .upload(filePath, imageFile);
+          
+        if (uploadError) throw uploadError;
+        
+        // Get public URL for the image
+        const { data: { publicUrl } } = supabase.storage
+          .from('products')
+          .getPublicUrl(filePath);
+          
+        imageUrl = publicUrl;
+      }
+      
+      // Insert the product data into the database
+      const { error } = await supabase.from('products').insert({
+        name: formData.name,
+        description: formData.description,
+        price: parseFloat(formData.price),
+        condition: formData.condition,
+        category: formData.category,
+        location: formData.location,
+        seller_id: user.id,
+        seller_phone: formData.sellerPhone,
+        image_url: imageUrl || 'https://via.placeholder.com/300',
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "تمت إضافة المنتج بنجاح",
+        description: "تم إدراج منتجك في سوق سوريا!",
+      });
+      
+      setTimeout(() => {
+        navigate('/my-products');
+      }, 1000);
+    } catch (error: any) {
+      console.error('Error adding product:', error);
+      toast({
+        title: "حدث خطأ",
+        description: error.message || "حدث خطأ أثناء إضافة المنتج",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   const categories = [
@@ -144,6 +177,10 @@ const AddProduct = () => {
     { id: 'toys', name: 'ألعاب' },
     { id: 'books', name: 'كتب' },
   ];
+  
+  if (!user) {
+    return null; // Don't render anything if not authenticated (will redirect)
+  }
   
   return (
     <Layout hideSearch>
@@ -239,6 +276,20 @@ const AddProduct = () => {
                     onChange={handleInputChange}
                   />
                 </div>
+              </div>
+              
+              {/* Seller Phone Number - New Field */}
+              <div className="space-y-2">
+                <Label htmlFor="sellerPhone">رقم هاتف البائع</Label>
+                <Input 
+                  id="sellerPhone" 
+                  type="tel" 
+                  placeholder="مثال: +963 934 567 890" 
+                  value={formData.sellerPhone}
+                  onChange={handleInputChange}
+                  required
+                />
+                <p className="text-xs text-gray-500">سيتم عرض رقم هاتفك للمشترين المحتملين</p>
               </div>
               
               {/* Condition */}

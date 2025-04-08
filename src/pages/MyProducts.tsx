@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { Badge } from '@/components/ui/badge';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { PlusCircle, Pencil, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -17,42 +17,97 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
-// Mock user products data - will be replaced with actual database data
-const initialUserProducts = [
-  {
-    id: '1',
-    name: 'ماك بوك برو',
-    price: 1299,
-    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-    status: 'available' as const,
-    views: 24,
-    createdAt: '2023-05-15',
-  },
-  {
-    id: '3',
-    name: 'سماعات آبل إيربودز برو',
-    price: 249,
-    image: 'https://images.unsplash.com/photo-1606741965509-ca2bf4b1d430?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-    status: 'sold' as const,
-    views: 56,
-    createdAt: '2023-04-20',
-  },
-];
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  image_url: string;
+  status: 'available' | 'sold' | 'deleted';
+  views: number;
+  created_at: string;
+}
 
 const MyProducts = () => {
-  const [userProducts, setUserProducts] = useState(initialUserProducts);
+  const [userProducts, setUserProducts] = useState<Product[]>([]);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   
-  const handleDeleteProduct = (id: string) => {
-    setUserProducts(prev => prev.filter(product => product.id !== id));
-    toast({
-      title: "تم حذف المنتج",
-      description: "تم حذف المنتج بنجاح من قائمة منتجاتك",
-    });
+  useEffect(() => {
+    // Redirect to login if not authenticated
+    if (!user) {
+      toast({
+        title: "يجب تسجيل الدخول",
+        description: "يرجى تسجيل الدخول لعرض منتجاتك",
+        variant: "destructive"
+      });
+      navigate('/login');
+      return;
+    }
+    
+    const fetchUserProducts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('seller_id', user.id)
+          .order('created_at', { ascending: false });
+          
+        if (error) throw error;
+        
+        setUserProducts(data || []);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        toast({
+          title: "خطأ في تحميل المنتجات",
+          description: "لم نتمكن من تحميل منتجاتك. يرجى المحاولة مرة أخرى.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchUserProducts();
+  }, [user, navigate, toast]);
+  
+  const handleDeleteProduct = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ status: 'deleted' })
+        .eq('id', id)
+        .eq('seller_id', user?.id);
+        
+      if (error) throw error;
+      
+      // Update the UI
+      setUserProducts(prev => prev.filter(product => product.id !== id));
+      
+      toast({
+        title: "تم حذف المنتج",
+        description: "تم حذف المنتج بنجاح من قائمة منتجاتك",
+      });
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      toast({
+        title: "خطأ في حذف المنتج",
+        description: "لم نتمكن من حذف المنتج. يرجى المحاولة مرة أخرى.",
+        variant: "destructive"
+      });
+    }
+    
     setProductToDelete(null);
   };
+
+  if (!user) {
+    return null; // Don't render anything if not authenticated (will redirect)
+  }
 
   return (
     <Layout>
@@ -66,12 +121,16 @@ const MyProducts = () => {
         </Link>
       </div>
       
-      {userProducts.length > 0 ? (
+      {isLoading ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500">جاري تحميل المنتجات...</p>
+        </div>
+      ) : userProducts.length > 0 ? (
         <div className="space-y-4">
           {userProducts.map(product => (
             <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden flex">
               <img 
-                src={product.image} 
+                src={product.image_url} 
                 alt={product.name} 
                 className="w-24 h-24 sm:w-32 sm:h-32 object-cover"
               />
@@ -88,7 +147,7 @@ const MyProducts = () => {
                   </div>
                   <p className="text-sooq-green font-bold mt-1">{product.price.toFixed(2)} $</p>
                   <p className="text-sm text-gray-500 mt-1">
-                    {product.views} مشاهدة • نُشر {product.createdAt}
+                    {product.views} مشاهدة • نُشر {new Date(product.created_at).toLocaleDateString('ar-SA')}
                   </p>
                 </div>
                 <div className="flex space-x-2 mt-2">

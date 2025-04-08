@@ -1,0 +1,45 @@
+
+/* Mobile layout fixes */
+@media (max-width: 768px) {
+  /* Center content in product cards */
+  .product-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  /* Ensure bottom navigation is centered */
+  .md\:hidden.fixed.bottom-0 .grid-cols-5 {
+    display: grid;
+    place-items: center;
+  }
+  
+  /* Make sure text in navigation is centered */
+  .md\:hidden.fixed.bottom-0 .flex-col {
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Improve tap targets for mobile */
+  .md\:hidden.fixed.bottom-0 a {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Fix spacing in product grids */
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    width: 100%;
+  }
+  
+  /* Ensure all product cards are the same height */
+  .product-grid > div {
+    height: 100%;
+  }
+}

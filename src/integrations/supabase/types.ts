@@ -9,7 +9,84 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      products: {
+        Row: {
+          category: string | null
+          condition: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          location: string
+          name: string
+          price: number
+          seller_id: string
+          seller_phone: string | null
+          status: string | null
+          updated_at: string
+          views: number | null
+        }
+        Insert: {
+          category?: string | null
+          condition: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          location: string
+          name: string
+          price: number
+          seller_id: string
+          seller_phone?: string | null
+          status?: string | null
+          updated_at?: string
+          views?: number | null
+        }
+        Update: {
+          category?: string | null
+          condition?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string
+          name?: string
+          price?: number
+          seller_id?: string
+          seller_phone?: string | null
+          status?: string | null
+          updated_at?: string
+          views?: number | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          phone_number: string | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          phone_number?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          phone_number?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

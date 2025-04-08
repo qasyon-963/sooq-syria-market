@@ -1,10 +1,11 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Home, PlusCircle, User, ShoppingBag, LogIn } from 'lucide-react';
+import { Search, Home, PlusCircle, User, ShoppingBag, LogIn, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAuth } from '@/context/AuthContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,6 +15,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children, hideSearch = false }) => {
   const location = useLocation();
   const isMobile = useIsMobile();
+  const { user, signOut } = useAuth();
   
   return (
     <div className="flex flex-col min-h-screen">
@@ -36,21 +38,47 @@ const Layout: React.FC<LayoutProps> = ({ children, hideSearch = false }) => {
           )}
           
           <div className="flex items-center space-x-2">
-            <Link to="/login" className="md:hidden">
-              <Button size="sm" variant="ghost">
-                <LogIn className="h-5 w-5 text-sooq-green" />
-              </Button>
-            </Link>
-            <Link to="/login">
-              <Button variant="outline" size="sm" className="hidden md:flex">
-                تسجيل الدخول
-              </Button>
-            </Link>
-            <Link to="/register">
-              <Button size="sm" className="hidden md:flex bg-sooq-green hover:bg-sooq-green-light mr-2">
-                إنشاء حساب
-              </Button>
-            </Link>
+            {user ? (
+              <>
+                <Link to="/profile" className="md:hidden">
+                  <Button size="sm" variant="ghost">
+                    <User className="h-5 w-5 text-sooq-green" />
+                  </Button>
+                </Link>
+                <Link to="/profile">
+                  <Button variant="outline" size="sm" className="hidden md:flex">
+                    الملف الشخصي
+                  </Button>
+                </Link>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  className="hidden md:flex text-red-500 border-red-500 hover:bg-red-50"
+                  onClick={() => signOut()}
+                >
+                  <LogOut className="mr-1 h-4 w-4" />
+                  تسجيل الخروج
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="md:hidden">
+                  <Button size="sm" variant="ghost">
+                    <LogIn className="h-5 w-5 text-sooq-green" />
+                  </Button>
+                </Link>
+                <Link to="/login">
+                  <Button variant="outline" size="sm" className="hidden md:flex">
+                    تسجيل الدخول
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button size="sm" className="hidden md:flex bg-sooq-green hover:bg-sooq-green-light mr-2">
+                    إنشاء حساب
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
         
@@ -79,24 +107,31 @@ const Layout: React.FC<LayoutProps> = ({ children, hideSearch = false }) => {
         <div className="grid grid-cols-5 h-16">
           <Link to="/" className={`flex flex-col items-center justify-center py-2 ${location.pathname === '/' ? 'text-sooq-green' : 'text-gray-500'}`}>
             <Home size={20} />
-            <span className="text-xs mt-1">الرئيسية</span>
+            <span className="text-xs mt-1 text-center">الرئيسية</span>
           </Link>
           <Link to="/search" className={`flex flex-col items-center justify-center py-2 ${location.pathname === '/search' ? 'text-sooq-green' : 'text-gray-500'}`}>
             <Search size={20} />
-            <span className="text-xs mt-1">البحث</span>
+            <span className="text-xs mt-1 text-center">البحث</span>
           </Link>
           <Link to="/add-product" className={`flex flex-col items-center justify-center py-2 ${location.pathname === '/add-product' ? 'text-sooq-green' : 'text-gray-500'}`}>
             <PlusCircle size={20} />
-            <span className="text-xs mt-1">بيع</span>
+            <span className="text-xs mt-1 text-center">بيع</span>
           </Link>
           <Link to="/my-products" className={`flex flex-col items-center justify-center py-2 ${location.pathname === '/my-products' ? 'text-sooq-green' : 'text-gray-500'}`}>
             <ShoppingBag size={20} />
-            <span className="text-xs mt-1">منتجاتي</span>
+            <span className="text-xs mt-1 text-center">منتجاتي</span>
           </Link>
-          <Link to="/profile" className={`flex flex-col items-center justify-center py-2 ${location.pathname === '/profile' ? 'text-sooq-green' : 'text-gray-500'}`}>
-            <User size={20} />
-            <span className="text-xs mt-1">الملف</span>
-          </Link>
+          {user ? (
+            <Link to="/profile" className={`flex flex-col items-center justify-center py-2 ${location.pathname === '/profile' ? 'text-sooq-green' : 'text-gray-500'}`}>
+              <User size={20} />
+              <span className="text-xs mt-1 text-center">الملف</span>
+            </Link>
+          ) : (
+            <Link to="/login" className={`flex flex-col items-center justify-center py-2 ${location.pathname === '/login' ? 'text-sooq-green' : 'text-gray-500'}`}>
+              <LogIn size={20} />
+              <span className="text-xs mt-1 text-center">دخول</span>
+            </Link>
+          )}
         </div>
       </nav>
     </div>
